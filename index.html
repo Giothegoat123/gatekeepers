@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Gio's Game Site</title>
+  <title>Gio Arcade</title>
 
   <style>
     body {
@@ -12,7 +12,6 @@
       text-align: center;
     }
 
-    /* LOGIN */
     #login {
       height: 100vh;
       display: flex;
@@ -24,9 +23,8 @@
     input {
       padding: 12px;
       font-size: 18px;
-      border: none;
       border-radius: 8px;
-      outline: none;
+      border: none;
     }
 
     button {
@@ -39,7 +37,6 @@
       cursor: pointer;
     }
 
-    /* HEADER */
     #header {
       display: none;
       padding: 15px;
@@ -47,7 +44,6 @@
       box-shadow: 0 0 20px #1f6fff;
     }
 
-    /* MENU */
     #menu {
       display: none;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -61,15 +57,8 @@
       padding: 20px;
       border-radius: 12px;
       cursor: pointer;
-      transition: 0.2s;
     }
 
-    .game:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #1f6fff;
-    }
-
-    /* GAME SCREEN */
     #play {
       display: none;
       padding: 20px;
@@ -85,37 +74,34 @@
 
 <body>
 
-<!-- LOGIN -->
 <div id="login">
-  <h1>🔐 Enter Access Code</h1>
-  <input id="code" placeholder="Enter code">
-  <button onclick="unlock()">Unlock</button>
+  <h1>🔐 Enter Code</h1>
+  <input id="code">
+  <button onclick="unlock()">Enter</button>
 </div>
 
-<!-- HEADER -->
 <div id="header">
   <h1>⚡ Welcome to Gio’s Game Site</h1>
 </div>
 
-<!-- MENU -->
 <div id="menu"></div>
 
-<!-- GAME -->
 <div id="play">
   <button onclick="back()">⬅ Back</button>
   <h2 id="title"></h2>
-  <div id="ui"></div>
   <canvas id="canvas" width="400" height="400"></canvas>
 </div>
 
 <script>
 
-let games = ["Snake", "BitLife"];
-let current = "";
+// SAFE START (prevents blank screen forever)
+try {
 
+let games = ["Snake"];
+let current = "";
 let ctx = document.getElementById("canvas").getContext("2d");
 
-/* ---------------- LOGIN ---------------- */
+/* LOGIN */
 function unlock() {
   let input = document.getElementById("code").value.trim();
 
@@ -129,7 +115,7 @@ function unlock() {
   }
 }
 
-/* ---------------- MENU ---------------- */
+/* MENU */
 function render() {
   let menu = document.getElementById("menu");
   menu.innerHTML = "";
@@ -150,10 +136,7 @@ function open(name) {
   document.getElementById("play").style.display = "block";
   document.getElementById("title").innerText = name;
 
-  ctx.clearRect(0,0,400,400);
-
   if (name === "Snake") snake();
-  if (name === "BitLife") bitlife();
 }
 
 function back() {
@@ -162,7 +145,7 @@ function back() {
   clearInterval(loop);
 }
 
-/* ---------------- SNAKE (REAL GRID GAME) ---------------- */
+/* REAL SNAKE */
 let snake, dir, food, loop;
 
 function snake() {
@@ -189,11 +172,11 @@ function snake() {
       snake.pop();
     }
 
-    drawSnake();
+    draw();
   }, 120);
 }
 
-function drawSnake() {
+function draw() {
   ctx.clearRect(0,0,400,400);
 
   ctx.fillStyle = "red";
@@ -210,42 +193,11 @@ function rand() {
   };
 }
 
-/* ---------------- BITLIFE ---------------- */
-let life;
+// START
+window.onload = render;
 
-function bitlife() {
-  life = {
-    age: 18,
-    money: 0,
-    happiness: 50
-  };
-
-  document.getElementById("ui").innerHTML = `
-    <button onclick="nextYear()">Next Year</button>
-    <p id="stats"></p>
-  `;
-
-  updateLife();
-}
-
-function nextYear() {
-  life.age++;
-
-  let events = [
-    () => life.money += 20,
-    () => life.money -= 10,
-    () => life.happiness += 10,
-    () => life.happiness -= 10
-  ];
-
-  events[Math.floor(Math.random()*events.length)]();
-
-  updateLife();
-}
-
-function updateLife() {
-  document.getElementById("stats").innerText =
-    `Age: ${life.age} | Money: $${life.money} | Happiness: ${life.happiness}`;
+} catch (e) {
+  document.body.innerHTML = "<h1>ERROR: " + e.message + "</h1>";
 }
 
 </script>
