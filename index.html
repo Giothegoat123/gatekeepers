@@ -14,7 +14,41 @@ body {
     font-family: 'Nunito Sans', sans-serif;
     background: linear-gradient(135deg, #0f172a, #1e293b);
     color: white;
-    display: none; /* 🔒 hidden until password is correct */
+}
+
+/* LOCK SCREEN */
+#lockScreen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #0f172a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+    font-size: 18px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #22c55e;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* PAGE CONTENT */
+#pageContent {
+    display: none;
 }
 
 header {
@@ -71,53 +105,8 @@ h1 {
     padding: 20px;
     border-radius: 12px;
     margin-top: 20px;
-    box-shadow: 0 0 20px rgba(34,197,94,0.2);
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.game {
-    background: #1f2937;
-    padding: 10px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-/* 🔐 LOGIN SCREEN */
-#lockScreen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: #0f172a;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-input {
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    text-align: center;
-    font-size: 18px;
-}
-
-button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background: #22c55e;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
 }
 </style>
-
 </head>
 
 <body>
@@ -128,6 +117,9 @@ button {
     <input type="password" id="codeInput" placeholder="Enter code">
     <button onclick="checkCode()">Unlock</button>
 </div>
+
+<!-- 🔓 PAGE CONTENT -->
+<div id="pageContent">
 
 <header>
     <a class="logo-text" href="/">Bitlife</a>
@@ -160,13 +152,15 @@ button {
 
 </div>
 
+</div>
+
 <script>
 function checkCode() {
     let code = document.getElementById("codeInput").value;
 
     if (code === "1218") {
         document.getElementById("lockScreen").style.display = "none";
-        document.body.style.display = "block";
+        document.getElementById("pageContent").style.display = "block";
     } else {
         alert("Wrong code");
     }
