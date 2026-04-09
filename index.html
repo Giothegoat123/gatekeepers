@@ -1,237 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
 <head>
-  <title>Gio Arcade</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(#050b1a, #000814);
-      color: white;
-    }
+<title>BitLife Update - Bitlife</title>
 
-    /* LOGIN */
-    #login {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+<!-- GOOGLE FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@500;700&display=swap" rel="stylesheet">
 
-    input {
-      padding: 12px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-    }
+<style>
+body {
+    margin: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: white;
+}
 
-    button {
-      padding: 10px 16px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #1f6fff;
-      color: white;
-      cursor: pointer;
-    }
+/* HEADER */
+header {
+    background: #111827;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #22c55e;
+}
 
-    /* HEADER */
-    #header {
-      display: none;
-      padding: 16px;
-      text-align: center;
-      background: linear-gradient(90deg, #001133, #0033aa);
-      box-shadow: 0 0 20px #1f6fff;
-    }
+.logo-text {
+    color: #22c55e;
+    font-size: 22px;
+    font-weight: bold;
+    text-decoration: none;
+}
 
-    /* GRID */
-    #menu {
-      display: none;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 15px;
-    }
+nav a {
+    color: white;
+    margin-left: 15px;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
 
-    .card {
-      background: #0b1b3a;
-      border: 1px solid #1f6fff;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 0 10px #1f6fff33;
-    }
+nav a:hover {
+    background: #22c55e;
+    color: black;
+}
 
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #1f6fff;
-    }
+/* GAME BOX */
+iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+    border-radius: 12px;
+    margin-top: 20px;
+}
 
-    /* GAME SCREEN */
-    #gameScreen {
-      display: none;
-      text-align: center;
-      padding: 20px;
-    }
+/* TITLE */
+h1 {
+    text-align: center;
+    color: #22c55e;
+    margin-top: 20px;
+}
 
-    canvas {
-      background: black;
-      border: 1px solid #1f6fff;
-      margin-top: 10px;
-    }
-  </style>
+/* SECTION */
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: #111827;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 0 20px rgba(34,197,94,0.2);
+}
+
+/* GAME GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.game {
+    background: #1f2937;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.game img {
+    width: 70px;
+    border-radius: 10px;
+}
+</style>
+
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
-  <h1>🔐 Enter Access Code</h1>
-  <input id="code" placeholder="1218">
-  <button onclick="unlock()">Enter</button>
+<header>
+    <a class="logo-text" href="/">Bitlife</a>
+    <nav>
+        <a href="/duck-life">Duck Life</a>
+        <a href="/dog-life-simulator">Dog Life</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <iframe src="https://lifesimulator.online/game/bitlife/"></iframe>
+
+    <h1>BitLife Update</h1>
+
+    <div class="card">
+        <h2>About</h2>
+        <p>Experience life like never before with new updates, choices, and paths.</p>
+    </div>
+
+    <div class="card">
+        <h2>What’s New</h2>
+        <ul>
+            <li>New life events</li>
+            <li>Better stats system</li>
+            <li>Improved UI</li>
+            <li>More customization</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>More Games</h2>
+
+        <div class="grid">
+            <div class="game">Duck Life</div>
+            <div class="game">Dog Life</div>
+            <div class="game">Cat Life</div>
+            <div class="game">God Simulator</div>
+        </div>
+    </div>
+
 </div>
-
-<!-- HEADER -->
-<div id="header">
-  <h1>⚡ Gio Arcade</h1>
-</div>
-
-<!-- MENU -->
-<div id="menu"></div>
-
-<!-- GAME SCREEN -->
-<div id="gameScreen">
-  <button onclick="back()">⬅ Back</button>
-  <h2 id="title"></h2>
-  <canvas id="canvas" width="400" height="400"></canvas>
-</div>
-
-<script>
-
-const games = [
-  "Snake",
-  "Clicker"
-];
-
-let ctx = document.getElementById("canvas").getContext("2d");
-let loop;
-
-/* 🔐 LOGIN */
-function unlock() {
-  const val = document.getElementById("code").value.trim();
-
-  if (val === "1218") {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("header").style.display = "block";
-    document.getElementById("menu").style.display = "grid";
-    render();
-  } else {
-    alert("Wrong code");
-  }
-}
-
-/* 🧭 MENU */
-function render() {
-  const menu = document.getElementById("menu");
-  menu.innerHTML = "";
-
-  games.forEach(name => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerText = name;
-    div.onclick = () => openGame(name);
-    menu.appendChild(div);
-  });
-}
-
-function openGame(name) {
-  document.getElementById("menu").style.display = "none";
-  document.getElementById("gameScreen").style.display = "block";
-  document.getElementById("title").innerText = name;
-
-  ctx.clearRect(0,0,400,400);
-
-  if (name === "Snake") snakeGame();
-  if (name === "Clicker") clickerGame();
-}
-
-function back() {
-  document.getElementById("menu").style.display = "grid";
-  document.getElementById("gameScreen").style.display = "none";
-  clearInterval(loop);
-}
-
-/* 🐍 SNAKE */
-let snake, dir, food;
-
-function snakeGame() {
-  snake = [{x:200,y:200}];
-  dir = {x:20,y:0};
-  food = rand();
-
-  document.onkeydown = e => {
-    if (e.key === "ArrowUp") dir = {x:0,y:-20};
-    if (e.key === "ArrowDown") dir = {x:0,y:20};
-    if (e.key === "ArrowLeft") dir = {x:-20,y:0};
-    if (e.key === "ArrowRight") dir = {x:20,y:0};
-  };
-
-  clearInterval(loop);
-
-  loop = setInterval(() => {
-    let head = {x:snake[0].x + dir.x, y:snake[0].y + dir.y};
-    snake.unshift(head);
-
-    if (head.x === food.x && head.y === food.y) {
-      food = rand();
-    } else {
-      snake.pop();
-    }
-
-    drawSnake();
-  }, 120);
-}
-
-function drawSnake() {
-  ctx.clearRect(0,0,400,400);
-
-  ctx.fillStyle = "red";
-  ctx.fillRect(food.x, food.y, 20, 20);
-
-  ctx.fillStyle = "lime";
-  snake.forEach(p => ctx.fillRect(p.x, p.y, 20, 20));
-}
-
-function rand() {
-  return {
-    x: Math.floor(Math.random()*20)*20,
-    y: Math.floor(Math.random()*20)*20
-  };
-}
-
-/* 🖱 CLICKER */
-let clicks = 0;
-
-function clickerGame() {
-  document.getElementById("canvas").style.display = "none";
-
-  document.getElementById("gameScreen").innerHTML += `
-    <button onclick="addClick()">Click Me</button>
-    <p id="score">0</p>
-  `;
-
-  window.addClick = function() {
-    clicks++;
-    document.getElementById("score").innerText = clicks;
-  };
-}
-
-</script>
 
 </body>
 </html>
