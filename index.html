@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gatekeepers</title>
+  <style>
+    body {
+      background: black;
+      color: lime;
+      font-family: monospace;
+      text-align: center;
+      margin-top: 100px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+    #game {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🔐 Gatekeepers</h1>
+<p>Enter Access Code:</p>
+
+<input id="code" placeholder="Enter code">
+<button onclick="unlock()">Unlock</button>
+
+<div id="game">
+  <h2>🟢 Access Granted</h2>
+  <p>You are inside the Gatekeepers system.</p>
+  <button onclick="play()">Start Game</button>
+  <p id="output"></p>
+</div>
+
+<script>
+function unlock() {
+  const code = document.getElementById("code").value;
+  if (code === "1218") {
+    document.getElementById("game").style.display = "block";
+  } else {
+    alert("Access Denied");
+  }
+}
+
+function play() {
+  const random = Math.floor(Math.random() * 10);
+  if (random > 5) {
+    document.getElementById("output").innerText = "You passed the gate!";
+  } else {
+    document.getElementById("output").innerText = "Blocked. Try again.";
+  }
+}
+</script>
+
+</body>
+</html>
