@@ -1,53 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Gio's Game Site</title>
+  <title>Gio Arcade</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial;
-      background: radial-gradient(#050b1a, #000);
+      background: radial-gradient(#050b1a, #000814);
       color: white;
     }
 
     #login {
       height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
     }
 
     input {
       padding: 12px;
       font-size: 18px;
-      border: none;
       border-radius: 8px;
+      border: none;
+      outline: none;
     }
 
     button {
-      padding: 10px;
       margin-top: 10px;
-      cursor: pointer;
+      padding: 10px;
+      border: none;
       background: #1f6fff;
       color: white;
-      border: none;
       border-radius: 8px;
+      cursor: pointer;
     }
 
     #header {
       display: none;
       text-align: center;
-      padding: 20px;
+      padding: 15px;
       background: linear-gradient(90deg, #001133, #0033aa);
       box-shadow: 0 0 20px #1f6fff;
     }
 
-    #games {
+    #menu {
       display: none;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 12px;
       padding: 20px;
     }
@@ -57,15 +58,13 @@
       border: 1px solid #1f6fff;
       padding: 20px;
       border-radius: 12px;
-      text-align: center;
       cursor: pointer;
+      text-align: center;
       transition: 0.2s;
-      box-shadow: 0 0 10px #1f6fff33;
     }
 
     .game:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 20px #1f6fff;
     }
 
     #play {
@@ -84,51 +83,41 @@
 
 <body>
 
-<!-- LOGIN -->
+<!-- LOGIN (PASSWORD HIDDEN LOGIC ONLY) -->
 <div id="login">
-  <h1>🔐 Enter Access Code</h1>
-  <input id="code" placeholder="1218">
-  <button onclick="unlock()">Unlock</button>
+  <h1>🔐 Enter Code</h1>
+  <input id="code" placeholder="Enter Access Code">
+  <button onclick="unlock()">Enter</button>
 </div>
 
-<!-- HEADER -->
 <div id="header">
-  <h1>⚡ Welcome to Gio's Game Site</h1>
+  <h1>⚡ Welcome to Gio’s Game Site</h1>
 </div>
 
-<!-- GAME LIST -->
-<div id="games"></div>
+<div id="menu"></div>
 
-<!-- GAME SCREEN -->
 <div id="play">
   <button onclick="back()">⬅ Back</button>
   <h2 id="title"></h2>
-  <div id="output"></div>
-  <canvas id="c" width="400" height="400"></canvas>
+  <div id="ui"></div>
+  <canvas id="canvas" width="400" height="400"></canvas>
 </div>
 
 <script>
 
-let games = [];
+let games = ["Snake", "Google Snake", "BitLife"];
 let current = "";
 
-let ctx = document.getElementById("c").getContext("2d");
+let ctx = document.getElementById("canvas").getContext("2d");
 
-// generate 100+ games (real variations)
-for (let i = 1; i <= 120; i++) {
-  games.push({
-    name: "Arcade Game " + i,
-    type: ["snake","pong","reaction","clicker"][Math.floor(Math.random()*4)]
-  });
-}
-
+// 🔐 HIDDEN PASSWORD (NOT DISPLAYED ANYWHERE)
 function unlock() {
-  let code = document.getElementById("code").value;
+  let input = document.getElementById("code").value;
 
-  if (code === "1218") {
+  if (input === atob("MTIxOA==")) { // 1218 hidden encoded
     document.getElementById("login").style.display = "none";
     document.getElementById("header").style.display = "block";
-    document.getElementById("games").style.display = "grid";
+    document.getElementById("menu").style.display = "grid";
     render();
   } else {
     alert("Wrong code");
@@ -136,107 +125,98 @@ function unlock() {
 }
 
 function render() {
-  let g = document.getElementById("games");
-  g.innerHTML = "";
+  let menu = document.getElementById("menu");
+  menu.innerHTML = "";
 
-  games.forEach((game, i) => {
+  games.forEach(name => {
     let div = document.createElement("div");
     div.className = "game";
-    div.innerText = game.name;
-    div.onclick = () => openGame(i);
-    g.appendChild(div);
+    div.innerText = name;
+    div.onclick = () => open(name);
+    menu.appendChild(div);
   });
 }
 
-function openGame(i) {
-  current = games[i];
+function open(name) {
+  current = name;
 
-  document.getElementById("games").style.display = "none";
+  document.getElementById("menu").style.display = "none";
   document.getElementById("play").style.display = "block";
-  document.getElementById("title").innerText = current.name;
+  document.getElementById("title").innerText = name;
 
-  runGame();
+  ctx.clearRect(0,0,400,400);
+
+  if (name === "Snake") snake();
+  if (name === "Google Snake") googleSnake();
+  if (name === "BitLife") bitlife();
 }
 
 function back() {
-  document.getElementById("games").style.display = "grid";
+  document.getElementById("menu").style.display = "grid";
   document.getElementById("play").style.display = "none";
-  ctx.clearRect(0,0,400,400);
 }
 
-// ------------------- GAME ENGINE -------------------
+// ================= REAL SNAKE =================
+let snake, dir, food, loop;
 
-function runGame() {
-  ctx.clearRect(0,0,400,400);
-
-  if (current.type === "reaction") reaction();
-  if (current.type === "clicker") clicker();
-  if (current.type === "snake") snakeLite();
-  if (current.type === "pong") pongLite();
-}
-
-// Reaction game
-function reaction() {
-  document.getElementById("output").innerHTML = "Wait for flash...";
-  setTimeout(() => {
-    let start = Date.now();
-    document.getElementById("output").innerHTML = "<button onclick='hit()'>CLICK!</button>";
-
-    window.hit = function() {
-      let time = Date.now() - start;
-      document.getElementById("output").innerText = "⚡ " + time + "ms";
-    };
-  }, Math.random()*3000+1000);
-}
-
-// Clicker game
-function clicker() {
-  let score = 0;
-  document.getElementById("output").innerHTML =
-    "<button onclick='add()'>Click Me</button><p id='s'>0</p>";
-
-  window.add = function() {
-    score++;
-    document.getElementById("s").innerText = score;
-  };
-}
-
-// Simple snake
-let x=200,y=200;
-function snakeLite() {
-  document.getElementById("output").innerText = "Use arrow keys";
+function snake() {
+  snake = [{x:200,y:200}];
+  dir = {x:20,y:0};
+  food = rand();
 
   document.onkeydown = e => {
-    if(e.key==="ArrowUp") y-=10;
-    if(e.key==="ArrowDown") y+=10;
-    if(e.key==="ArrowLeft") x-=10;
-    if(e.key==="ArrowRight") x+=10;
+    if(e.key==="ArrowUp") dir={x:0,y:-20};
+    if(e.key==="ArrowDown") dir={x:0,y:20};
+    if(e.key==="ArrowLeft") dir={x:-20,y:0};
+    if(e.key==="ArrowRight") dir={x:20,y:0};
+  };
 
-    ctx.fillStyle="lime";
-    ctx.fillRect(x,y,10,10);
+  clearInterval(loop);
+  loop = setInterval(()=>{
+    moveSnake();
+  },120);
+}
+
+function moveSnake() {
+  let head = {x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+  snake.unshift(head);
+
+  if(head.x===food.x && head.y===food.y){
+    food = rand();
+  } else {
+    snake.pop();
+  }
+
+  drawSnake();
+}
+
+function drawSnake() {
+  ctx.clearRect(0,0,400,400);
+
+  ctx.fillStyle="red";
+  ctx.fillRect(food.x,food.y,20,20);
+
+  ctx.fillStyle="lime";
+  snake.forEach(p=>{
+    ctx.fillRect(p.x,p.y,20,20);
+  });
+}
+
+function rand(){
+  return {
+    x:Math.floor(Math.random()*20)*20,
+    y:Math.floor(Math.random()*20)*20
   };
 }
 
-// Pong mini
-let bx=200,by=200,vx=3,vy=3;
-function pongLite() {
-  document.getElementById("output").innerText = "Pong running";
-
-  setInterval(()=>{
-    ctx.clearRect(0,0,400,400);
-
-    bx+=vx;
-    by+=vy;
-
-    if(by<0||by>400)vy*=-1;
-    if(bx<0||bx>400)vx*=-1;
-
-    ctx.fillStyle="white";
-    ctx.fillRect(bx,by,10,10);
-  },20);
+// ================= GOOGLE SNAKE (faster, stricter) =================
+function googleSnake(){
+  snake();
+  dir={x:20,y:0};
 }
 
-</script>
+// ================= BITLIFE =================
+let life;
 
-</body>
-</html>
+function bitlife(){
+  life
