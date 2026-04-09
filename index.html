@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Gio Arcade</title>
+  <title>Gio's Game Site</title>
 
   <style>
     body {
@@ -9,8 +9,10 @@
       font-family: Arial;
       background: radial-gradient(#050b1a, #000814);
       color: white;
+      text-align: center;
     }
 
+    /* LOGIN */
     #login {
       height: 100vh;
       display: flex;
@@ -22,32 +24,32 @@
     input {
       padding: 12px;
       font-size: 18px;
-      border-radius: 8px;
       border: none;
+      border-radius: 8px;
       outline: none;
     }
 
     button {
-      margin-top: 10px;
       padding: 10px;
+      margin-top: 10px;
       border: none;
+      border-radius: 8px;
       background: #1f6fff;
       color: white;
-      border-radius: 8px;
       cursor: pointer;
     }
 
+    /* HEADER */
     #header {
       display: none;
-      text-align: center;
       padding: 15px;
       background: linear-gradient(90deg, #001133, #0033aa);
       box-shadow: 0 0 20px #1f6fff;
     }
 
+    /* MENU */
     #menu {
       display: none;
-      display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 12px;
       padding: 20px;
@@ -59,43 +61,46 @@
       padding: 20px;
       border-radius: 12px;
       cursor: pointer;
-      text-align: center;
       transition: 0.2s;
     }
 
     .game:hover {
       transform: scale(1.05);
+      box-shadow: 0 0 15px #1f6fff;
     }
 
+    /* GAME SCREEN */
     #play {
       display: none;
-      text-align: center;
       padding: 20px;
     }
 
     canvas {
       background: black;
-      margin-top: 10px;
       border: 1px solid #1f6fff;
+      margin-top: 10px;
     }
   </style>
 </head>
 
 <body>
 
-<!-- LOGIN (PASSWORD HIDDEN LOGIC ONLY) -->
+<!-- LOGIN -->
 <div id="login">
-  <h1>🔐 Enter Code</h1>
-  <input id="code" placeholder="Enter Access Code">
-  <button onclick="unlock()">Enter</button>
+  <h1>🔐 Enter Access Code</h1>
+  <input id="code" placeholder="Enter code">
+  <button onclick="unlock()">Unlock</button>
 </div>
 
+<!-- HEADER -->
 <div id="header">
   <h1>⚡ Welcome to Gio’s Game Site</h1>
 </div>
 
+<!-- MENU -->
 <div id="menu"></div>
 
+<!-- GAME -->
 <div id="play">
   <button onclick="back()">⬅ Back</button>
   <h2 id="title"></h2>
@@ -105,16 +110,16 @@
 
 <script>
 
-let games = ["Snake", "Google Snake", "BitLife"];
+let games = ["Snake", "BitLife"];
 let current = "";
 
 let ctx = document.getElementById("canvas").getContext("2d");
 
-// 🔐 HIDDEN PASSWORD (NOT DISPLAYED ANYWHERE)
+/* ---------------- LOGIN ---------------- */
 function unlock() {
-  let input = document.getElementById("code").value;
+  let input = document.getElementById("code").value.trim();
 
-  if (input === atob("MTIxOA==")) { // 1218 hidden encoded
+  if (input === "1218") {
     document.getElementById("login").style.display = "none";
     document.getElementById("header").style.display = "block";
     document.getElementById("menu").style.display = "grid";
@@ -124,6 +129,7 @@ function unlock() {
   }
 }
 
+/* ---------------- MENU ---------------- */
 function render() {
   let menu = document.getElementById("menu");
   menu.innerHTML = "";
@@ -147,16 +153,16 @@ function open(name) {
   ctx.clearRect(0,0,400,400);
 
   if (name === "Snake") snake();
-  if (name === "Google Snake") googleSnake();
   if (name === "BitLife") bitlife();
 }
 
 function back() {
   document.getElementById("menu").style.display = "grid";
   document.getElementById("play").style.display = "none";
+  clearInterval(loop);
 }
 
-// ================= REAL SNAKE =================
+/* ---------------- SNAKE (REAL GRID GAME) ---------------- */
 let snake, dir, food, loop;
 
 function snake() {
@@ -165,58 +171,84 @@ function snake() {
   food = rand();
 
   document.onkeydown = e => {
-    if(e.key==="ArrowUp") dir={x:0,y:-20};
-    if(e.key==="ArrowDown") dir={x:0,y:20};
-    if(e.key==="ArrowLeft") dir={x:-20,y:0};
-    if(e.key==="ArrowRight") dir={x:20,y:0};
+    if (e.key === "ArrowUp") dir = {x:0,y:-20};
+    if (e.key === "ArrowDown") dir = {x:0,y:20};
+    if (e.key === "ArrowLeft") dir = {x:-20,y:0};
+    if (e.key === "ArrowRight") dir = {x:20,y:0};
   };
 
   clearInterval(loop);
-  loop = setInterval(()=>{
-    moveSnake();
-  },120);
-}
 
-function moveSnake() {
-  let head = {x:snake[0].x+dir.x, y:snake[0].y+dir.y};
-  snake.unshift(head);
+  loop = setInterval(() => {
+    let head = {x:snake[0].x + dir.x, y:snake[0].y + dir.y};
+    snake.unshift(head);
 
-  if(head.x===food.x && head.y===food.y){
-    food = rand();
-  } else {
-    snake.pop();
-  }
+    if (head.x === food.x && head.y === food.y) {
+      food = rand();
+    } else {
+      snake.pop();
+    }
 
-  drawSnake();
+    drawSnake();
+  }, 120);
 }
 
 function drawSnake() {
   ctx.clearRect(0,0,400,400);
 
-  ctx.fillStyle="red";
-  ctx.fillRect(food.x,food.y,20,20);
+  ctx.fillStyle = "red";
+  ctx.fillRect(food.x, food.y, 20, 20);
 
-  ctx.fillStyle="lime";
-  snake.forEach(p=>{
-    ctx.fillRect(p.x,p.y,20,20);
-  });
+  ctx.fillStyle = "lime";
+  snake.forEach(p => ctx.fillRect(p.x, p.y, 20, 20));
 }
 
-function rand(){
+function rand() {
   return {
-    x:Math.floor(Math.random()*20)*20,
-    y:Math.floor(Math.random()*20)*20
+    x: Math.floor(Math.random()*20)*20,
+    y: Math.floor(Math.random()*20)*20
   };
 }
 
-// ================= GOOGLE SNAKE (faster, stricter) =================
-function googleSnake(){
-  snake();
-  dir={x:20,y:0};
-}
-
-// ================= BITLIFE =================
+/* ---------------- BITLIFE ---------------- */
 let life;
 
-function bitlife(){
-  life
+function bitlife() {
+  life = {
+    age: 18,
+    money: 0,
+    happiness: 50
+  };
+
+  document.getElementById("ui").innerHTML = `
+    <button onclick="nextYear()">Next Year</button>
+    <p id="stats"></p>
+  `;
+
+  updateLife();
+}
+
+function nextYear() {
+  life.age++;
+
+  let events = [
+    () => life.money += 20,
+    () => life.money -= 10,
+    () => life.happiness += 10,
+    () => life.happiness -= 10
+  ];
+
+  events[Math.floor(Math.random()*events.length)]();
+
+  updateLife();
+}
+
+function updateLife() {
+  document.getElementById("stats").innerText =
+    `Age: ${life.age} | Money: $${life.money} | Happiness: ${life.happiness}`;
+}
+
+</script>
+
+</body>
+</html>
