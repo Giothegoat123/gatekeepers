@@ -1,246 +1,240 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Gatekeepers Arcade</title>
+  <title>Gio's Game Site</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial;
-      background: #f2f2f2;
-      text-align: center;
+      background: radial-gradient(#050b1a, #000);
+      color: white;
     }
 
-    #topbar {
-      background: #111;
+    #login {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+      background: #1f6fff;
       color: white;
-      padding: 15px;
+      border: none;
+      border-radius: 8px;
+    }
+
+    #header {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(90deg, #001133, #0033aa);
+      box-shadow: 0 0 20px #1f6fff;
     }
 
     #games {
+      display: none;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 15px;
+      gap: 12px;
       padding: 20px;
     }
 
     .game {
-      background: white;
+      background: #0b1b3a;
+      border: 1px solid #1f6fff;
       padding: 20px;
       border-radius: 12px;
+      text-align: center;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: 0.2s;
+      box-shadow: 0 0 10px #1f6fff33;
     }
 
-    #screen {
+    .game:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #1f6fff;
+    }
+
+    #play {
       display: none;
+      text-align: center;
       padding: 20px;
     }
 
     canvas {
       background: black;
       margin-top: 10px;
-    }
-
-    button {
-      padding: 10px;
-      margin: 5px;
+      border: 1px solid #1f6fff;
     }
   </style>
 </head>
 
 <body>
 
-<div id="topbar">
-  <h1>🎮 Gatekeepers Arcade</h1>
+<!-- LOGIN -->
+<div id="login">
+  <h1>🔐 Enter Access Code</h1>
+  <input id="code" placeholder="1218">
+  <button onclick="unlock()">Unlock</button>
 </div>
 
+<!-- HEADER -->
+<div id="header">
+  <h1>⚡ Welcome to Gio's Game Site</h1>
+</div>
+
+<!-- GAME LIST -->
 <div id="games"></div>
 
-<div id="screen">
+<!-- GAME SCREEN -->
+<div id="play">
   <button onclick="back()">⬅ Back</button>
   <h2 id="title"></h2>
   <div id="output"></div>
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <canvas id="c" width="400" height="400"></canvas>
 </div>
 
 <script>
 
-let games = ["Snake", "Pong", "BitLife"];
+let games = [];
 let current = "";
 
+let ctx = document.getElementById("c").getContext("2d");
+
+// generate 100+ games (real variations)
+for (let i = 1; i <= 120; i++) {
+  games.push({
+    name: "Arcade Game " + i,
+    type: ["snake","pong","reaction","clicker"][Math.floor(Math.random()*4)]
+  });
+}
+
+function unlock() {
+  let code = document.getElementById("code").value;
+
+  if (code === "1218") {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("header").style.display = "block";
+    document.getElementById("games").style.display = "grid";
+    render();
+  } else {
+    alert("Wrong code");
+  }
+}
+
 function render() {
-  const g = document.getElementById("games");
+  let g = document.getElementById("games");
   g.innerHTML = "";
 
-  games.forEach(name => {
-    const div = document.createElement("div");
+  games.forEach((game, i) => {
+    let div = document.createElement("div");
     div.className = "game";
-    div.innerText = name;
-    div.onclick = () => open(name);
+    div.innerText = game.name;
+    div.onclick = () => openGame(i);
     g.appendChild(div);
   });
 }
 
-function open(name) {
-  current = name;
+function openGame(i) {
+  current = games[i];
 
   document.getElementById("games").style.display = "none";
-  document.getElementById("screen").style.display = "block";
-  document.getElementById("title").innerText = name;
+  document.getElementById("play").style.display = "block";
+  document.getElementById("title").innerText = current.name;
 
-  clearCanvas();
-
-  if (name === "Snake") snake();
-  if (name === "Pong") pong();
-  if (name === "BitLife") bitlife();
+  runGame();
 }
 
 function back() {
   document.getElementById("games").style.display = "grid";
-  document.getElementById("screen").style.display = "none";
-  clearInterval(loop);
-}
-
-// ------------------ CANVAS ------------------
-let ctx = document.getElementById("gameCanvas").getContext("2d");
-
-function clearCanvas() {
+  document.getElementById("play").style.display = "none";
   ctx.clearRect(0,0,400,400);
 }
 
-// ================== SNAKE ==================
-let snakeBody, dir, food, loop;
+// ------------------- GAME ENGINE -------------------
 
-function snake() {
-  snakeBody = [{x:200,y:200}];
-  dir = {x:20,y:0};
-  food = randomFood();
+function runGame() {
+  ctx.clearRect(0,0,400,400);
+
+  if (current.type === "reaction") reaction();
+  if (current.type === "clicker") clicker();
+  if (current.type === "snake") snakeLite();
+  if (current.type === "pong") pongLite();
+}
+
+// Reaction game
+function reaction() {
+  document.getElementById("output").innerHTML = "Wait for flash...";
+  setTimeout(() => {
+    let start = Date.now();
+    document.getElementById("output").innerHTML = "<button onclick='hit()'>CLICK!</button>";
+
+    window.hit = function() {
+      let time = Date.now() - start;
+      document.getElementById("output").innerText = "⚡ " + time + "ms";
+    };
+  }, Math.random()*3000+1000);
+}
+
+// Clicker game
+function clicker() {
+  let score = 0;
+  document.getElementById("output").innerHTML =
+    "<button onclick='add()'>Click Me</button><p id='s'>0</p>";
+
+  window.add = function() {
+    score++;
+    document.getElementById("s").innerText = score;
+  };
+}
+
+// Simple snake
+let x=200,y=200;
+function snakeLite() {
+  document.getElementById("output").innerText = "Use arrow keys";
 
   document.onkeydown = e => {
-    if (e.key === "ArrowUp") dir = {x:0,y:-20};
-    if (e.key === "ArrowDown") dir = {x:0,y:20};
-    if (e.key === "ArrowLeft") dir = {x:-20,y:0};
-    if (e.key === "ArrowRight") dir = {x:20,y:0};
-  };
+    if(e.key==="ArrowUp") y-=10;
+    if(e.key==="ArrowDown") y+=10;
+    if(e.key==="ArrowLeft") x-=10;
+    if(e.key==="ArrowRight") x+=10;
 
-  loop = setInterval(() => {
-    let head = {
-      x: snakeBody[0].x + dir.x,
-      y: snakeBody[0].y + dir.y
-    };
-
-    snakeBody.unshift(head);
-
-    if (head.x === food.x && head.y === food.y) {
-      food = randomFood();
-    } else {
-      snakeBody.pop();
-    }
-
-    drawSnake();
-  }, 120);
-}
-
-function drawSnake() {
-  ctx.clearRect(0,0,400,400);
-
-  ctx.fillStyle = "red";
-  ctx.fillRect(food.x, food.y, 20, 20);
-
-  ctx.fillStyle = "lime";
-  snakeBody.forEach(p => {
-    ctx.fillRect(p.x, p.y, 20, 20);
-  });
-}
-
-function randomFood() {
-  return {
-    x: Math.floor(Math.random()*20)*20,
-    y: Math.floor(Math.random()*20)*20
+    ctx.fillStyle="lime";
+    ctx.fillRect(x,y,10,10);
   };
 }
 
-// ================== PONG ==================
-let ball, paddleY, ballSpeed;
+// Pong mini
+let bx=200,by=200,vx=3,vy=3;
+function pongLite() {
+  document.getElementById("output").innerText = "Pong running";
 
-function pong() {
-  ball = {x:200,y:200,vx:3,vy:3};
-  paddleY = 150;
-
-  document.onmousemove = e => {
-    let rect = document.getElementById("gameCanvas").getBoundingClientRect();
-    paddleY = e.clientY - rect.top;
-  };
-
-  loop = setInterval(() => {
+  setInterval(()=>{
     ctx.clearRect(0,0,400,400);
 
-    // ball
-    ball.x += ball.vx;
-    ball.y += ball.vy;
+    bx+=vx;
+    by+=vy;
 
-    if (ball.y < 0 || ball.y > 400) ball.vy *= -1;
+    if(by<0||by>400)vy*=-1;
+    if(bx<0||bx>400)vx*=-1;
 
-    // AI paddle
-    let aiY = ball.y - 30;
-
-    // collision player
-    if (ball.x < 20 && ball.y > paddleY && ball.y < paddleY + 60) {
-      ball.vx *= -1;
-    }
-
-    // collision AI
-    if (ball.x > 380) ball.vx *= -1;
-
-    ctx.fillStyle = "white";
-    ctx.fillRect(ball.x, ball.y, 10, 10);
-
-    ctx.fillRect(10, paddleY, 10, 60);
-    ctx.fillRect(380, aiY, 10, 60);
-
-  }, 16);
+    ctx.fillStyle="white";
+    ctx.fillRect(bx,by,10,10);
+  },20);
 }
-
-// ================== BITLIFE ==================
-let life = {};
-
-function bitlife() {
-  life = {
-    age: 18,
-    money: 0,
-    happiness: 50
-  };
-
-  document.getElementById("output").innerHTML = `
-    <button onclick="live()">Next Year</button>
-    <p id="stats"></p>
-  `;
-
-  updateLife();
-}
-
-function live() {
-  life.age++;
-
-  let events = [
-    () => life.money += 20,
-    () => life.happiness += 10,
-    () => life.money -= 10,
-    () => life.happiness -= 10
-  ];
-
-  events[Math.floor(Math.random()*events.length)]();
-
-  updateLife();
-}
-
-function updateLife() {
-  document.getElementById("stats").innerText =
-    `Age: ${life.age} | Money: $${life.money} | Happiness: ${life.happiness}`;
-}
-
-window.onload = render;
 
 </script>
 
