@@ -2,25 +2,57 @@
 <html>
 <head>
   <title>Gatekeepers</title>
-  <style>
-    body {
-      background: black;
-      color: lime;
-      font-family: monospace;
-      text-align: center;
-      margin-top: 100px;
-    }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-    }
-    #game {
-      display: none;
-    }
-  </style>
-</head>
-<body>
+  <style>body {
+  margin: 0;
+  font-family: Arial;
+  background: #f2f2f2;
+}
 
+#topbar {
+  background: #111;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+#search {
+  padding: 10px;
+  width: 60%;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+#games {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  padding: 20px;
+}
+
+.game {
+  background: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.game:hover {
+  background: #ddd;
+}  <div id="topbar">
+  <h1>🎮 Gatekeepers Arcade</h1>
+  <input id="search" placeholder="Search games..." oninput="renderGames()">
+</div>
+
+<div id="games"></div>
+
+<div id="playScreen" style="display:none;">
+  <button onclick="back()">⬅ Back</button>
+  <h2 id="gameTitle"></h2>
+  <p id="gameOutput"></p>
+  <button onclick="playGame()">Play</button>
+</div>
 <h1>🔐 Gatekeepers</h1>
 <p>Enter Access Code:</p>
 
@@ -52,7 +84,53 @@ function play() {
     document.getElementById("output").innerText = "Blocked. Try again.";
   }
 }
-</script>
+</script>let games = [];
 
+// create 500 fake games
+for (let i = 1; i <= 500; i++) {
+  games.push({
+    id: i,
+    name: "Game " + i
+  });
+}
+
+function renderGames() {
+  const search = document.getElementById("search").value.toLowerCase();
+  const container = document.getElementById("games");
+
+  container.innerHTML = "";
+
+  for (let g of games) {
+    if (g.name.toLowerCase().includes(search)) {
+      container.innerHTML += `
+        <div class="game" onclick="openGame(${g.id})">
+          ${g.name}
+        </div>
+      `;
+    }
+  }
+}
+
+function openGame(id) {
+  document.getElementById("games").style.display = "none";
+  document.getElementById("playScreen").style.display = "block";
+
+  document.getElementById("gameTitle").innerText = "Game " + id;
+  document.getElementById("gameOutput").innerText = "";
+}
+
+function back() {
+  document.getElementById("games").style.display = "grid";
+  document.getElementById("playScreen").style.display = "none";
+  renderGames();
+}
+
+function playGame() {
+  const result = Math.random() > 0.5 ? "You won!" : "You lost!";
+  document.getElementById("gameOutput").innerText = result;
+}
+
+// load games on start
+window.onload = renderGames;
 </body>
 </html>
